@@ -4,9 +4,9 @@ class_name CameraTransition extends Node
 
 @export_category("Cameras")
 @export var from_camera_type: CameraType
-@export var from_camera: VirtualCamera
+@export var from_camera: VirtualCamera3D
 @export var to_camera_type: CameraType
-@export var to_camera: VirtualCamera
+@export var to_camera: VirtualCamera3D
 
 @export_category("Transition")
 @export var transition_type: TransitionType

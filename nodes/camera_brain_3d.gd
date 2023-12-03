@@ -3,14 +3,14 @@
 class_name CameraBrain3D extends Camera3D
 
 @export_group("Virtual Cameras")
-var vcams: Array[VirtualCamera]
+var vcams: Array[VirtualCamera3D]
 @export var active_cam: int: 
 	set(value):
 		active_cam = value % vcams.size()
 		location_node = vcams[active_cam].get_child(0)
 		target_node = vcams[active_cam].get_child(1)
 
-var active: VirtualCamera: 
+var active: VirtualCamera3D: 
 	get:
 		return vcams[active_cam]
 

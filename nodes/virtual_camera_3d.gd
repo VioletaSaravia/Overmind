@@ -1,6 +1,6 @@
 @icon("res://addons/Overmind/assets/camera_red.svg")
 ## Defines a the parameters of a virtual camera to be used by a CameraBrain node.
-class_name VirtualCamera extends Node
+class_name VirtualCamera3D extends Node
 
 var x_loc_dampener: Dampener
 var v_loc_dampener: Dampener
