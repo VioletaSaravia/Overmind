@@ -1,6 +1,6 @@
-## Core node of CineCam for 2D scenes.
+## Core node of Overmind for 2D scenes.
 @tool
-@icon("res://addons/CineCam/assets/brain_blue.svg")
+@icon("res://addons/Overmind/assets/brain_blue.svg")
 class_name CameraBrain2D extends Camera2D
 
 

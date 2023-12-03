@@ -1,5 +1,5 @@
-## Core node of CineCam for 3D scenes.
-@icon("res://addons/CineCam/assets/brain_red.svg")
+## Core node of Overmind for 3D scenes.
+@icon("res://addons/Overmind/assets/brain_red.svg")
 class_name CameraBrain3D extends Camera3D
 
 @export_group("Virtual Cameras")

@@ -1,5 +1,5 @@
 @tool
-@icon("res://addons/CineCam/assets/transition_red.svg")
+@icon("res://addons/Overmind/assets/transition_red.svg")
 class_name CameraTransition extends Node
 
 @export_category("Cameras")

@@ -1,4 +1,4 @@
-@icon("res://addons/CineCam/assets/camera_red.svg")
+@icon("res://addons/Overmind/assets/camera_red.svg")
 ## Defines a the parameters of a virtual camera to be used by a CameraBrain node.
 class_name VirtualCamera extends Node
 

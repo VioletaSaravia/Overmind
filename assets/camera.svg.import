@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://yo7155lgmcov"
-path="res://.godot/imported/camera.svg-270020995137eae2afc75be77f34a6d3.ctex"
+path="res://.godot/imported/camera.svg-49a56e396e252a0a7c991423590fc999.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/CineCam/assets/camera.svg"
-dest_files=["res://.godot/imported/camera.svg-270020995137eae2afc75be77f34a6d3.ctex"]
+source_file="res://addons/Overmind/assets/camera.svg"
+dest_files=["res://.godot/imported/camera.svg-49a56e396e252a0a7c991423590fc999.ctex"]
 
 [params]
 

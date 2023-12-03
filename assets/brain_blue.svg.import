@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bdgwkr1fk3u5k"
-path="res://.godot/imported/brain_blue.svg-007849b9c24b28a91a6375ace1b82392.ctex"
+path="res://.godot/imported/brain_blue.svg-e643c0a1f29316586ced545dc7d08e87.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/CineCam/assets/brain_blue.svg"
-dest_files=["res://.godot/imported/brain_blue.svg-007849b9c24b28a91a6375ace1b82392.ctex"]
+source_file="res://addons/Overmind/assets/brain_blue.svg"
+dest_files=["res://.godot/imported/brain_blue.svg-e643c0a1f29316586ced545dc7d08e87.ctex"]
 
 [params]
 
