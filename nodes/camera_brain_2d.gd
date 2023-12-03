@@ -3,14 +3,14 @@
 class_name CameraBrain2D extends Camera2D
 
 @export_group("Virtual Cameras")
-var vcams: Array[VirtualCamera]
+var vcams: Array[VirtualCamera2D]
 @export var active_cam: int: 
 	set(value):
 		active_cam = value % vcams.size()
 		location_node = vcams[active_cam].get_child(0)
 		target_node = vcams[active_cam].get_child(1)
 
-var active: VirtualCamera: 
+var active: VirtualCamera2D: 
 	get:
 		return vcams[active_cam]
 
@@ -37,7 +37,7 @@ func _physics_process(delta):
 		node.execute(delta)
 	
 	# PLACEMENT
-	var location: Vector3 = location_node.position
+	var location: Vector2 = location_node.position
 	var local_track = quaternion * Vector3(active.track, 0, 0)
 	var local_pedestal = Vector3(0, active.pedestal, 0)
 	
@@ -54,7 +54,7 @@ func _physics_process(delta):
 	self.position = col.get("position") if col else new_position
 	
 	# TARGETING
-	var target: Vector3 = target_node.position
+	var target: Vector2 = target_node.position
 	var track_focus = target + get_orbit(0, active.yaw + -PI/2, 0)
 	self.look_at(track_focus + Vector3(0, active.tilt, 0) + local_track)
 
