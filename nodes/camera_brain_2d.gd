@@ -1,68 +1,28 @@
-## Core node of Overmind for 3D scenes.
+## Core node of Overmind for 2D scenes.
 @icon("res://addons/Overmind/assets/brain_blue.svg")
 class_name CameraBrain2D extends Camera2D
 
 @export_group("Virtual Cameras")
 var vcams: Array[VirtualCamera2D]
 @export var active_cam: int: 
-	set(value):
-		active_cam = value % vcams.size()
-		location_node = vcams[active_cam].get_child(0)
-		target_node = vcams[active_cam].get_child(1)
+	set(value): active_cam = value % vcams.size()
 
-var active: VirtualCamera2D: 
-	get:
-		return vcams[active_cam]
-
-var location_node: Node2D
-var target_node: Node2D
+var active: VirtualCamera2D:
+	get: return vcams[active_cam]
 
 func _ready():
 	process_priority = 999
 
 	for cam in get_children():
 		vcams.push_back(cam)
+		
+	position = active.location
 
-	location_node = vcams[active_cam].get_child(0)
-	target_node = vcams[active_cam].get_child(1)
-	self.position = location_node.position
-	self.rotation = location_node.rotation
-
-var col: Dictionary
-@onready var space_state = get_world_2d().direct_space_state
-
-func _physics_process(delta):
-	# CAMERA SCRIPTS
+func _process(delta):
 	for node in active.find_children("", "CameraScript"):
 		node.execute(delta)
 	
-	# PLACEMENT
-	var location: Vector2 = location_node.position
-	var local_track = quaternion * Vector3(active.track, 0, 0)
-	var local_pedestal = Vector3(0, active.pedestal, 0)
-	
-	var new_position: Vector3 = location + local_pedestal + local_track \
-		+ get_orbit(active.radius, active.yaw, active.pitch)
-			
-	if active.collides:
-		var origin = location_node.position
-		var end = new_position
-		var query = PhysicsRayQueryParameters3D.create(origin, end)
-		query.collide_with_areas = true
-		col = space_state.intersect_ray(query)
-	
-	self.position = col.get("position") if col else new_position
-	
-	# TARGETING
-	var target: Vector2 = target_node.position
-	var track_focus = target + get_orbit(0, active.yaw + -PI/2, 0)
-	self.look_at(track_focus + Vector3(0, active.tilt, 0) + local_track)
+	position = active.location + active.offset + polar_to_xy(active.radius, active.angle)
 
-func get_orbit(_radius: float, _yaw: float, _pitch: float) -> Vector3:
-	var ray := Vector3.FORWARD
-	ray = Quaternion(Vector3.UP, TAU - _yaw) * ray
-
-	var _pitch_axis := ray.cross(Vector3.UP)
-	ray = Quaternion(_pitch_axis, TAU - _pitch) * ray
-
-	return ray * - _radius
+func polar_to_xy(radius: float, angle: float) -> Vector2:
+	return Vector2(radius * cos(angle), radius * sin(angle))

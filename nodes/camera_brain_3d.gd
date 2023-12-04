@@ -45,12 +45,12 @@ func _physics_process(delta):
 		+ get_orbit(active.radius, active.yaw, active.pitch)
 			
 	if active.collides:
-		var origin = location_node.position
-		var end = new_position
-		var query = PhysicsRayQueryParameters3D.create(origin, end)
+		var query = PhysicsRayQueryParameters3D.create(location, new_position, 1)
 		query.collide_with_areas = true
 		col = space_state.intersect_ray(query)
 	
+	if col:
+		print(col)
 	self.position = col.get("position") if col else new_position
 	
 	# TARGETING
