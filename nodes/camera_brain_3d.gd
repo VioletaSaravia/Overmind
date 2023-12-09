@@ -6,6 +6,9 @@ class_name CameraBrain3D extends Camera3D
 var vcams: Array[VirtualCamera3D]
 @export var active_cam: int: 
 	set(value):
+		if vcams.size() == 0:
+			return
+			
 		active_cam = value % vcams.size()
 		location_node = vcams[active_cam].get_child(0)
 		target_node = vcams[active_cam].get_child(1)
@@ -49,8 +52,6 @@ func _physics_process(delta):
 		query.collide_with_areas = true
 		col = space_state.intersect_ray(query)
 	
-	if col:
-		print(col)
 	self.position = col.get("position") if col else new_position
 	
 	# TARGETING

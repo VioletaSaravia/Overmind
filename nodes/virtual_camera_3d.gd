@@ -3,11 +3,11 @@
 class_name VirtualCamera3D extends Node
 
 var x_loc_dampener: Dampener
-var v_loc_dampener: Dampener
+var y_loc_dampener: Dampener
 var z_loc_dampener: Dampener
 
 var x_target_dampener: Dampener
-var v_target_dampener: Dampener
+var y_target_dampener: Dampener
 var z_target_dampener: Dampener
 
 @export_group("General Settings")
@@ -21,6 +21,8 @@ var z_target_dampener: Dampener
 @export_group("Location Settings")
 ## Which Node3D's position(s) will be used to set the camera location.
 @export var location_follow_node: Array[Node3D]
+@export var follow_horizontal: bool = true
+@export var follow_vertical: bool = true
 
 @export_subgroup("Location Damping")
 ## Whether the location following is damped or not.
@@ -63,18 +65,18 @@ func _set_loc_hr(r: float):
 
 func _set_loc_vf(f: float):
 	v_location_f = f
-	if v_loc_dampener:
-		v_loc_dampener.set_parameters(f)
+	if y_loc_dampener:
+		y_loc_dampener.set_parameters(f)
 	
 func _set_loc_vz(z: float):
 	v_location_z = z
-	if v_loc_dampener:
-		v_loc_dampener.set_parameters(v_location_f, z)
+	if y_loc_dampener:
+		y_loc_dampener.set_parameters(v_location_f, z)
 	
 func _set_loc_vr(r: float):
 	v_location_r = r
-	if v_loc_dampener:
-		v_loc_dampener.set_parameters(v_location_f, v_location_z, r)
+	if y_loc_dampener:
+		y_loc_dampener.set_parameters(v_location_f, v_location_z, r)
 
 @export_subgroup("Orbiting Settings")
 ## Vertical rotation.
@@ -137,18 +139,18 @@ func _set_target_hr(r: float):
 
 func _set_target_vf(f: float):
 	v_target_f = f
-	if v_target_dampener:
-		v_target_dampener.set_parameters(f)
+	if y_target_dampener:
+		y_target_dampener.set_parameters(f)
 	
 func _set_target_vz(z: float):
 	v_target_z = z
-	if v_target_dampener:
-		v_target_dampener.set_parameters(v_target_f, z)
+	if y_target_dampener:
+		y_target_dampener.set_parameters(v_target_f, z)
 	
 func _set_target_vr(r: float):
 	v_target_r = r
-	if v_target_dampener:
-		v_target_dampener.set_parameters(v_target_f, v_target_z, r)
+	if y_target_dampener:
+		y_target_dampener.set_parameters(v_target_f, v_target_z, r)
 
 @onready var location: Node3D = $Location
 @onready var target: Node3D = $Target
@@ -167,7 +169,7 @@ func _ready():
 	
 	x_loc_dampener = Dampener.new(
 		location_follow_node[0].position.x, h_location_f, h_location_z, h_location_r)
-	v_loc_dampener = Dampener.new(
+	y_loc_dampener = Dampener.new(
 		location_follow_node[0].position.y, v_location_f, v_location_z, v_location_r)
 	z_loc_dampener = Dampener.new(
 		location_follow_node[0].position.z, h_location_f, h_location_z, h_location_r)
@@ -181,28 +183,52 @@ func _ready():
 	
 	x_target_dampener = Dampener.new(
 		target_follow_node[0].position.x, x_target_f, x_target_z, x_target_r)
-	v_target_dampener = Dampener.new(
+	y_target_dampener = Dampener.new(
 		target_follow_node[0].position.y, v_target_f, v_target_z, v_target_r)
 	z_target_dampener = Dampener.new(
 		target_follow_node[0].position.z, x_target_f, x_target_z, x_target_r)
-		
+
+var first_f: float = 1
+var first_z: float = 1
+var first_r: float = 0
+
+var other_f: float = 1
+var other_z: float = 2
+var other_r: float = 3
+@onready var player: PlayerState = $"/root/main/Player"
 
 func _process(delta):
+	var player_angle = (player.quaternion * Vector3.FORWARD).angle_to(Vector3.FORWARD)
+	player_angle = sin(player_angle)
+	print(player_angle)
+	
+	h_location_f = lerp(first_f, other_f, player_angle)
+	h_location_r = lerp(first_r, other_r, player_angle)
+	h_location_z = lerp(first_z, other_z, player_angle)
+	
 	var new_location_pos: Vector3 = location_follow_node[0].position
-	
 	for n in location_follow_node:
+		# Errors if the array has empty elements
 		new_location_pos = lerp(new_location_pos, n.position, 0.5)
-	
 	location.transform.basis = location_follow_node[0].basis
 	
-	location.position = Vector3(
-		x_loc_dampener.update_motion(delta, new_location_pos.x) 
-			if h_location_damp else new_location_pos.x,
-		v_loc_dampener.update_motion(delta, new_location_pos.y) 
-			if v_location_damp else new_location_pos.y,
-		z_loc_dampener.update_motion(delta, new_location_pos.z) 
-			if h_location_damp else new_location_pos.z,
-		)
+	match [h_location_damp, follow_horizontal]:
+		[true, true]:
+			location.position.x = x_loc_dampener.update_motion(delta, new_location_pos.x)
+			location.position.z = z_loc_dampener.update_motion(delta, new_location_pos.z)
+		[_, false]:
+			pass
+		[false, true]:
+			location.position.x = new_location_pos.x
+			location.position.z = new_location_pos.z
+			
+	match [v_location_damp, follow_vertical]:
+		[true, true]:
+			location.position.y = y_loc_dampener.update_motion(delta, new_location_pos.y)
+		[_, false]:
+			pass
+		[false, true]:
+			location.position.y = new_location_pos.y
 		
 	if target_equals_location:
 		target.position = location.position
@@ -215,7 +241,7 @@ func _process(delta):
 	target.position = Vector3(
 		x_target_dampener.update_motion(delta, new_target_pos.x)
 			if x_target_damp else new_target_pos.x,
-		v_target_dampener.update_motion(delta, new_target_pos.y)
+		y_target_dampener.update_motion(delta, new_target_pos.y)
 			if v_target_damp else new_target_pos.y,
 		z_target_dampener.update_motion(delta, new_target_pos.z)
 			if x_target_damp else new_target_pos.z,
