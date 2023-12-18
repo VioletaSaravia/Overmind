@@ -1,17 +1,10 @@
+@tool
 @icon("res://addons/Overmind/assets/camera_red.svg")
-## Defines a the parameters of a virtual camera to be used by a CameraBrain node.
-class_name VirtualCamera3D extends Node
-
-var x_loc_dampener: Dampener
-var y_loc_dampener: Dampener
-var z_loc_dampener: Dampener
-
-var x_target_dampener: Dampener
-var y_target_dampener: Dampener
-var z_target_dampener: Dampener
+## Defines the parameters of a virtual camera to be used by a CameraBrain node.
+class_name VirtualCamera3D extends Node3D
 
 @export_group("General Settings")
-## Set the target to be the same as the location. When enabled, all the location 
+## Set the target to be the same as the location. When enabled, all the location
 ## settings affect the target too, and the target settings do nothing.
 ## Ideal for player cameras.
 @export var target_equals_location: bool = true
@@ -20,68 +13,25 @@ var z_target_dampener: Dampener
 
 @export_group("Location Settings")
 ## Which Node3D's position(s) will be used to set the camera location.
-@export var location_follow_node: Array[Node3D]
+@export var follow_nodes: Array[Node3D]
 @export var follow_horizontal: bool = true
 @export var follow_vertical: bool = true
+@export var horizontal_damper: DampedValue = DampedValue.new()
+var x_damper: DampedValue = DampedValue.new()
+var z_damper: DampedValue = DampedValue.new()
+@export var vertical_damper: DampedValue = DampedValue.new()
 
-@export_subgroup("Location Damping")
-## Whether the location following is damped or not.
-@export var h_location_damp: bool = true
-## Frequency, in Hz. Makes the movement bounce as it settles in place.
-@export_range(0.1, 5) var h_location_f: float = 1 : set = _set_loc_hf
-## Damping Coefficient, describes how the system settles on target.
-@export_range(0, 2) var h_location_z: float = 1 : set = _set_loc_hz
-## Initial response of the system. At 1, the system reacts immediately to input.
-## Above 1, the sstem overshoots the target. Below 0, the motion is anticipated.
-@export_range(-5, 5) var h_location_r: float = 0 : set = _set_loc_hr
-
-func _set_loc_hf(f: float):
-	h_location_f = f
-	if x_loc_dampener:
-		x_loc_dampener.set_parameters(f)
-		z_loc_dampener.set_parameters(f)
-	
-func _set_loc_hz(z: float):
-	h_location_z = z
-	if x_loc_dampener:
-		x_loc_dampener.set_parameters(h_location_f, z)
-		z_loc_dampener.set_parameters(h_location_f, z)
-	
-func _set_loc_hr(r: float):
-	h_location_r = r
-	if x_loc_dampener:
-		x_loc_dampener.set_parameters(h_location_f, h_location_z, r)
-		z_loc_dampener.set_parameters(h_location_f, h_location_z, r)		
-
-## Whether the location following is damped or not.
-@export var v_location_damp: bool = true
-## Frequency, in Hz. Makes the movement bounce as it settles in place.
-@export_range(0.1, 5) var v_location_f: float = 1 : set = _set_loc_vf
-## Damping Coefficient, describes how the system settles on target.
-@export_range(0, 2) var v_location_z: float = 1 : set = _set_loc_vz
-## Initial response of the system. At 1, the system reacts immediately to input.
-## Above 1, the sstem overshoots the target. Below 0, the motion is anticipated.
-@export_range(-5, 5) var v_location_r: float = 0 : set = _set_loc_vr
-
-func _set_loc_vf(f: float):
-	v_location_f = f
-	if y_loc_dampener:
-		y_loc_dampener.set_parameters(f)
-	
-func _set_loc_vz(z: float):
-	v_location_z = z
-	if y_loc_dampener:
-		y_loc_dampener.set_parameters(v_location_f, z)
-	
-func _set_loc_vr(r: float):
-	v_location_r = r
-	if y_loc_dampener:
-		y_loc_dampener.set_parameters(v_location_f, v_location_z, r)
+# TODO
+# CURRENT EXPORT RANGES FOR TILT/PAN/ETC ARE KINDA RANDOM
+# TURN VALUES LIKE TILT/PAN INTO DEGREES
 
 @export_subgroup("Orbiting Settings")
+## Distance from location.
+@export_range(0, 20) var dolly: float = 3
 ## Vertical rotation.
 @export_range(-3, 3) var tilt: float = 1
-# TODO: pan (Horizontal rotation)
+## Horizontal rotation
+@export_range(-3, 3) var pan: float = 0
 ## Horizontal displacement.
 @export_range(-3, 3) var track: float = 0
 ## Vertical displacement.
@@ -90,159 +40,88 @@ func _set_loc_vr(r: float):
 @export_range(-TAU, TAU) var yaw: float
 ## Vertical pivoting around location.
 @export_range(-TAU/4 + 0.1, TAU/4 - 0.1) var pitch: float = .3
-## Distance from location.
-@export_range(0, 20) var radius: float = 3
+## Rotation of the camera along its longitudinal axis.
+@export_range(- TAU / 2, TAU / 2) var roll: float = 0
 
 @export_group("Target Settings")
 ## Which Node3D's position(s) will be used to set the camera target.
-@export var target_follow_node: Array[Node3D]
+@export var target_nodes: Array[Node3D]
+@export var target_damper: DampedValue
+var target: Vector3
 
-@export_subgroup("Target Damping")
-## Whether the target following is damped or not.
-@export var x_target_damp: bool = true
-## Frequency, in Hz. Makes the movement bounce as it settles in place.
-@export_range(0.1, 5) var x_target_f: float = 1 : set = _set_target_hf
-## Damping Coefficient, describes how the system settles on target.
-@export_range(0, 2) var x_target_z: float = 1 : set = _set_target_hz
-## Initial response of the system. At 1, the system reacts immediately to input.
-## Above 1, the system overshoots the target. Below 0, the motion is anticipated.
-@export_range(-5, 5) var x_target_r: float = 0 : set = _set_target_hr
-
-func _set_target_hf(f: float):
-	x_target_f = f
-	if x_target_dampener:
-		x_target_dampener.set_parameters(f)
-		z_target_dampener.set_parameters(f)
-		
-	
-func _set_target_hz(z: float):
-	x_target_z = z
-	if x_target_dampener:
-		x_target_dampener.set_parameters(x_target_f, z)
-		z_target_dampener.set_parameters(x_target_f, z)
-	
-func _set_target_hr(r: float):
-	x_target_r = r
-	if x_target_dampener:
-		x_target_dampener.set_parameters(x_target_f, x_target_z, r)
-		z_target_dampener.set_parameters(x_target_f, x_target_z, r)
-
-## Whether the target following is damped or not.
-@export var v_target_damp: bool = true
-## Frequency, in Hz. Makes the movement bounce as it settles in place.
-@export_range(0.1, 5) var v_target_f: float = 1 : set = _set_target_vf
-## Damping Coefficient, describes how the system settles on target.
-@export_range(0, 2) var v_target_z: float = 1 : set = _set_target_vz
-## Initial response of the system. At 1, the system reacts immediately to input.
-## Above 1, the system overshoots the target. Below 0, the motion is anticipated.
-@export_range(-5, 5) var v_target_r: float = 0 : set = _set_target_vr
-
-func _set_target_vf(f: float):
-	v_target_f = f
-	if y_target_dampener:
-		y_target_dampener.set_parameters(f)
-	
-func _set_target_vz(z: float):
-	v_target_z = z
-	if y_target_dampener:
-		y_target_dampener.set_parameters(v_target_f, z)
-	
-func _set_target_vr(r: float):
-	v_target_r = r
-	if y_target_dampener:
-		y_target_dampener.set_parameters(v_target_f, v_target_z, r)
-
-@onready var location: Node3D = $Location
-@onready var target: Node3D = $Target
 @onready var cam: Camera3D = $".."
-
-var test_dampener: Dampener
 
 func _ready():
 	process_priority = 998
 	
-	location.transform.basis = location_follow_node[0].basis
-	
-	if location_follow_node.size() == 0: 
-		printerr("Location Follow Node array contains no nodes.")
+	if follow_nodes.size() == 0 or follow_nodes[0] == null:
+		if Engine.is_editor_hint():
+			pass
+			x_damper.start(0)
+			z_damper.start(0)
+			vertical_damper.start(0)
+		else:
+			printerr("Location Follow Node array contains no nodes.")
 		return
+		
+	x_damper = horizontal_damper.duplicate()
+	x_damper.start(follow_nodes[0].position.x)
+	z_damper = horizontal_damper.duplicate()
+	z_damper.start(follow_nodes[0].position.z)
+	vertical_damper.start(follow_nodes[0].position.y)
 	
-	x_loc_dampener = Dampener.new(
-		location_follow_node[0].position.x, h_location_f, h_location_z, h_location_r)
-	y_loc_dampener = Dampener.new(
-		location_follow_node[0].position.y, v_location_f, v_location_z, v_location_r)
-	z_loc_dampener = Dampener.new(
-		location_follow_node[0].position.z, h_location_f, h_location_z, h_location_r)
+	position = follow_nodes[0].position
 
 	if target_equals_location:
 		return
 
-	if target_follow_node.size() == 0: 
+	if target_nodes.size() == 0: 
 		printerr("Target Follow Node array contains no nodes.")
 		return
-	
-	x_target_dampener = Dampener.new(
-		target_follow_node[0].position.x, x_target_f, x_target_z, x_target_r)
-	y_target_dampener = Dampener.new(
-		target_follow_node[0].position.y, v_target_f, v_target_z, v_target_r)
-	z_target_dampener = Dampener.new(
-		target_follow_node[0].position.z, x_target_f, x_target_z, x_target_r)
-
-var first_f: float = 1
-var first_z: float = 1
-var first_r: float = 0
-
-var other_f: float = 1
-var other_z: float = 2
-var other_r: float = 3
-@onready var player: PlayerState = $"/root/main/Player"
+		
+	target = target_nodes[0].position
+	target_damper.start(target)
 
 func _process(delta):
-	var player_angle = (player.quaternion * Vector3.FORWARD).angle_to(Vector3.FORWARD)
-	player_angle = sin(player_angle)
-	print(player_angle)
+	# TODO ugh
+	x_damper.set_parameters(
+		horizontal_damper.f,
+		horizontal_damper.z,
+		horizontal_damper.r
+	)
+	z_damper.set_parameters(
+		horizontal_damper.f,
+		horizontal_damper.z,
+		horizontal_damper.r
+	)
 	
-	h_location_f = lerp(first_f, other_f, player_angle)
-	h_location_r = lerp(first_r, other_r, player_angle)
-	h_location_z = lerp(first_z, other_z, player_angle)
+	var new_location: Vector3
+	if follow_nodes.size() == 0 or follow_nodes[0] != null:
+		new_location = Vector3.ZERO
+	else:
+		new_location = follow_nodes[0].position
+		
+	for n in follow_nodes:
+		if n != null:
+			new_location = lerp(new_location, n.position, 0.5)
 	
-	var new_location_pos: Vector3 = location_follow_node[0].position
-	for n in location_follow_node:
-		# Errors if the array has empty elements
-		new_location_pos = lerp(new_location_pos, n.position, 0.5)
-	location.transform.basis = location_follow_node[0].basis
+	x_damper.update(delta, new_location.x)
+	z_damper.update(delta, new_location.z)
+	vertical_damper.update(delta, new_location.y)
 	
-	match [h_location_damp, follow_horizontal]:
-		[true, true]:
-			location.position.x = x_loc_dampener.update_motion(delta, new_location_pos.x)
-			location.position.z = z_loc_dampener.update_motion(delta, new_location_pos.z)
-		[_, false]:
-			pass
-		[false, true]:
-			location.position.x = new_location_pos.x
-			location.position.z = new_location_pos.z
-			
-	match [v_location_damp, follow_vertical]:
-		[true, true]:
-			location.position.y = y_loc_dampener.update_motion(delta, new_location_pos.y)
-		[_, false]:
-			pass
-		[false, true]:
-			location.position.y = new_location_pos.y
+	position = Vector3(x_damper.value, vertical_damper.value, z_damper.value)
 		
 	if target_equals_location:
-		target.position = location.position
+		target = position
 		return
 
-	var new_target_pos: Vector3 = target_follow_node[0].position
-	for n in target_follow_node:
-		new_target_pos = lerp(new_target_pos, n.position, 0.5)
+	var new_target: Vector3 = target_nodes[0].position \
+		if target_nodes[0] != null \
+		else Vector3.ZERO
 
-	target.position = Vector3(
-		x_target_dampener.update_motion(delta, new_target_pos.x)
-			if x_target_damp else new_target_pos.x,
-		y_target_dampener.update_motion(delta, new_target_pos.y)
-			if v_target_damp else new_target_pos.y,
-		z_target_dampener.update_motion(delta, new_target_pos.z)
-			if x_target_damp else new_target_pos.z,
-		)
+	for n in target_nodes:
+		if n != null:
+			new_target = lerp(new_target, n.position, 0.5)
+
+	target_damper.update(delta, new_target)
+	target = target_damper.value
