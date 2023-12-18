@@ -1,11 +1,11 @@
 @icon("res://addons/Overmind/assets/camera_blue.svg")
 ## Defines the parameters of a 2D virtual camera to be used by a CameraBrain2D node.
-class_name VirtualCamera2D extends Node
+class_name VirtualCamera2D extends Node2D
 
 @onready var location: Vector2 = Vector2.ZERO
 @onready var cam: CameraBrain2D = $".."
-var x_damper: Dampener
-var y_damper: Dampener
+var x_damper: DampedValue
+var y_damper: DampedValue
 
 @export_group("Settings")
 ## Which Node2D's position(s) will be used to set the camera location.
@@ -66,10 +66,8 @@ func _ready():
 		
 	location = follow_node[0].position
 	
-	x_damper = Dampener.new(
-		follow_node[0].position.x, x_location_f, x_location_z, x_location_r)
-	y_damper = Dampener.new(
-		follow_node[0].position.y, y_location_f, y_location_z, y_location_r)
+	x_damper = DampedValue.new()
+	y_damper = DampedValue.new()
 
 func _process(delta):
 	var new_location: Vector2 = follow_node[0].position

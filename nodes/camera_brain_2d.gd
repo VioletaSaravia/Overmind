@@ -24,5 +24,5 @@ func _process(delta):
 	
 	position = active.location + active.offset + polar_to_xy(active.radius, active.angle)
 
-func polar_to_xy(radius: float, angle: float) -> Vector2:
+static func polar_to_xy(radius: float, angle: float) -> Vector2:
 	return Vector2(radius * cos(angle), radius * sin(angle))

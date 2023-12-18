@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://bwmohv0g6y7ch"]
+
+[ext_resource type="Script" path="res://addons/Overmind/nodes/virtual_camera_3d.gd" id="1_ejaaq"]
+[ext_resource type="Script" path="res://addons/Overmind/examples/virtual camera scripts/3D/manual_turn.gd" id="2_l3su6"]
+[ext_resource type="Script" path="res://addons/Overmind/examples/virtual camera scripts/3D/auto_turn.gd" id="3_8tfnx"]
+[ext_resource type="Script" path="res://addons/Overmind/examples/virtual camera scripts/3D/player_damping.gd" id="4_h7tqi"]
+
+[node name="Player3rdPerson" type="Node" node_paths=PackedStringArray("location_follow_node")]
+script = ExtResource("1_ejaaq")
+location_follow_node = [NodePath("")]
+h_location_z = 2.0
+h_location_r = 3.0
+
+[node name="Location" type="Node3D" parent="."]
+
+[node name="Target" type="Node3D" parent="."]
+
+[node name="Manual Turn" type="Node" parent="."]
+script = ExtResource("2_l3su6")
+
+[node name="Auto Turn" type="Node" parent="."]
+script = ExtResource("3_8tfnx")
+
+[node name="Player Dampening" type="Node" parent="."]
+script = ExtResource("4_h7tqi")

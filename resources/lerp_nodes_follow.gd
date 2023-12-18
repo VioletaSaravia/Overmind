@@ -1,0 +1,2 @@
+extends CameraFollow
+class_name LerpNodesFollow
