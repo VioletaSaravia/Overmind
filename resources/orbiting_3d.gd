@@ -1,5 +1,5 @@
 extends Resource
-class_name Orbiting
+class_name Orbiting3D
 
 ## Distance from location.
 @export_range(0, 20) var dolly: float = 3

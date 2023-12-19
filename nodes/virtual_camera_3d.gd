@@ -17,10 +17,8 @@ class_name VirtualCamera3D extends Node3D
 @export var follow_horizontal: bool = true
 @export var follow_vertical: bool = true
 @export var horizontal_damper: DampedValue = DampedValue.new()
-var x_damper: DampedValue = DampedValue.new()
-var z_damper: DampedValue = DampedValue.new()
 @export var vertical_damper: DampedValue = DampedValue.new()
-@export var orbiting: Orbiting = Orbiting.new()
+@export var orbiting: Orbiting3D = Orbiting3D.new()
 
 # TODO
 # CURRENT EXPORT RANGES FOR TILT/PAN/ETC ARE KINDA RANDOM
@@ -32,70 +30,50 @@ var z_damper: DampedValue = DampedValue.new()
 @export var target_damper: DampedValue = DampedValue.new()
 var target: Vector3
 
-@onready var cam: Camera3D = $".."
-
 func _ready():
 	process_priority = 998
-	print(follow_node)
 	
 	if not follow_node:
 		if Engine.is_editor_hint():
-			x_damper.start(0)
-			z_damper.start(0)
+			horizontal_damper.start(Vector2(0, 0))
 			vertical_damper.start(0)
 		else:
-			printerr("Location Follow Node array contains no nodes.")
+			printerr("No follow node set.")
 		return
-		
-	x_damper = horizontal_damper.duplicate()
-	x_damper.start(follow_node.position.x)
-	z_damper = horizontal_damper.duplicate()
-	z_damper.start(follow_node.position.z)
+
+	horizontal_damper.start(
+		Vector2(follow_node.position.x, follow_node.position.z))
 	vertical_damper.start(follow_node.position.y)
 	
 	position = follow_node.position
 
-	if target_equals_location:
+	if not target_node:
 		return
 
-	if target_node.size() == 0: 
-		printerr("Target Follow Node array contains no nodes.")
-		return
-		
 	target = target_node.position
 	target_damper.start(target)
-	
+
+var new_location: Vector3
+var new_target: Vector3
 
 func _process(delta):
-	# TODO ugh. pasar a setter de horizontal?
-	x_damper.set_parameters(
-		horizontal_damper.f,
-		horizontal_damper.z,
-		horizontal_damper.r
-	)
-	z_damper.set_parameters(
-		horizontal_damper.f,
-		horizontal_damper.z,
-		horizontal_damper.r
-	)
-	
-	var new_location: Vector3 = Vector3.ZERO \
+	new_location = Vector3.ZERO \
 		if not follow_node \
 		else follow_node.position
 		
-	x_damper.update(delta, new_location.x)
-	z_damper.update(delta, new_location.z)
+	horizontal_damper.update(delta, Vector2(new_location.x, new_location.z))
 	vertical_damper.update(delta, new_location.y)
 	
-	position = Vector3(x_damper.value, vertical_damper.value, z_damper.value)
+	position = Vector3(
+		horizontal_damper.value.x, 
+		vertical_damper.value, 
+		horizontal_damper.value.y
+	)
 		
-	if target_equals_location:
+	if not target_node:
 		target = position
 		return
 
-	var new_target: Vector3 = Vector3.ZERO \
-		if target_node == null \
-		else target_node.position
-
+	new_target = target_node.position
 	target_damper.update(delta, new_target)
 	target = target_damper.value
