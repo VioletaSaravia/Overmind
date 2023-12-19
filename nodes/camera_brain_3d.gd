@@ -4,7 +4,11 @@
 class_name CameraBrain3D extends Camera3D
 
 @export_group("Virtual Cameras")
-var vcams: Array[VirtualCamera3D]
+var vcams: Array[VirtualCamera3D]:
+	set(value):
+		vcams = value
+		update_configuration_warnings()
+
 @export var active_cam: int:
 	set(value):
 		if vcams.size() == 0:
@@ -17,9 +21,13 @@ var active: VirtualCamera3D:
 
 func _ready():
 	process_priority = 999
-
 	for cam in get_children():
 		vcams.push_back(cam)
+		
+	update_configuration_warnings()
+	
+	if vcams.size() == 0:
+		return
 
 	position = active.position
 	rotation = active.rotation
@@ -27,7 +35,22 @@ func _ready():
 var col: Dictionary
 @onready var space_state = get_world_3d().direct_space_state
 
+func _get_configuration_warnings() -> PackedStringArray:
+	if vcams.size() == 0:
+		return ["CameraBrain must have at least one VirtualCamera3D as a child to work."]
+	else:
+		return []
+
 func _process(delta):
+	vcams.clear()
+	for cam in get_children():
+		vcams.push_back(cam)
+		
+	update_configuration_warnings()
+		
+	if vcams.size() == 0:
+		return
+		
 	# CAMERA SCRIPTS
 	if not Engine.is_editor_hint():
 		for node in active.find_children("", "CameraScript3D"):
@@ -35,11 +58,11 @@ func _process(delta):
 	
 	# PLACEMENT
 	var location: Vector3 = active.position
-	var local_track = quaternion * Vector3(active.track, 0, 0)
-	var local_pedestal = Vector3(0, active.pedestal, 0)
+	var local_track = quaternion * Vector3(active.orbiting.track, 0, 0)
+	var local_pedestal = Vector3(0, active.orbiting.pedestal, 0)
 	
 	var new_position: Vector3 = location + local_pedestal + local_track \
-		+ calculate_orbit(active.dolly, active.yaw, active.pitch)
+		+ calculate_orbit(active.orbiting.dolly, active.orbiting.yaw, active.orbiting.pitch)
 			
 	if active.collides:
 		var query = PhysicsRayQueryParameters3D.create(location, new_position, 1)
@@ -49,10 +72,10 @@ func _process(delta):
 	position = col.position if col else new_position
 	
 	# TARGETING
-	var track_focus = active.target + calculate_orbit(0, active.yaw + -PI/2, 0)
-	look_at(track_focus + Vector3(active.pan, active.tilt, 0) + local_track)
+	var track_focus = active.target + calculate_orbit(0, active.orbiting.yaw + -PI/2, 0)
+	look_at(track_focus + Vector3(active.orbiting.pan, active.orbiting.tilt, 0) + local_track)
 	
-	rotate(quaternion * Vector3.FORWARD, active.roll)
+	rotate(quaternion * Vector3.FORWARD, active.orbiting.roll)
 
 static func calculate_orbit(radius: float, yaw: float, pitch: float) -> Vector3:
 	var ray := Vector3.FORWARD
