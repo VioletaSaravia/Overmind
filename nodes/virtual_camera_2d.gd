@@ -34,9 +34,13 @@ func _ready():
 	position = follow_node.position
 
 func _process(delta):
-	var new_location: Vector2 = Vector2.ZERO \
-		if not follow_node \
-		else follow_node.position
+	if not follow_node:
+		return
+
+	var new_location: Vector2 = Vector2(
+		follow_node.position.x if follow_x else position.x, 
+		follow_node.position.y if follow_y else position.y
+	)
 		
 	x_damper.update(delta, new_location.x)
 	y_damper.update(delta, new_location.y)

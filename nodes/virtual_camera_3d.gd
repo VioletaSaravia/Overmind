@@ -14,8 +14,7 @@ class_name VirtualCamera3D extends Node3D
 @export_group("Location Settings")
 ## Which Node3D's position will be used to set the camera location.
 @export var follow_node: Node3D
-@export var follow_horizontal: bool = true
-@export var follow_vertical: bool = true
+# TODO constraints
 @export var horizontal_damper: DampedValue = DampedValue.new()
 @export var vertical_damper: DampedValue = DampedValue.new()
 @export var orbiting: Orbiting3D = Orbiting3D.new()
