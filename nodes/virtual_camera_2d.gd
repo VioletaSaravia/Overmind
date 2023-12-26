@@ -3,9 +3,6 @@
 ## Defines the parameters of a virtual camera to be used by a CameraBrain node.
 class_name VirtualCamera2D extends Node2D
 
-@export_group("General Settings")
-@export var some_setting: bool = false
-
 @export_group("Location Settings")
 ## Which Node2D's position will be used to set the camera location.
 @export var follow_node: Node2D
