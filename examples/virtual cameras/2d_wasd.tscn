@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://addons/Overmind/nodes/virtual_camera_2d.gd" id="1_efvv8"]
 [ext_resource type="Script" path="res://addons/Overmind/resources/damped_value.gd" id="2_mtfal"]
 [ext_resource type="Script" path="res://addons/Overmind/resources/orbiting_2d.gd" id="3_abqcd"]
-[ext_resource type="Script" path="res://wasd_camera.gd" id="4_ow1pg"]
+[ext_resource type="Script" path="res://addons/Overmind/examples/virtual camera scripts/2D/wasd_camera.gd" id="4_ow1pg"]
 
 [sub_resource type="Resource" id="Resource_3ndv6"]
 script = ExtResource("2_mtfal")
@@ -29,10 +29,9 @@ zoom = 0.5
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cpiqk"]
 size = Vector2(1920, 1080)
 
-[node name="WASD" type="Node2D" node_paths=PackedStringArray("follow_node")]
+[node name="WASD" type="Node2D"]
 process_priority = 998
 script = ExtResource("1_efvv8")
-follow_node = NodePath("")
 x_damper = SubResource("Resource_3ndv6")
 y_damper = SubResource("Resource_we0n8")
 orbiting = SubResource("Resource_g82e4")
