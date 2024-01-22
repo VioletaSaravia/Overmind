@@ -2,6 +2,7 @@
 class_name DampedValue extends Resource
 
 @export var enabled: bool = true
+@export var started: bool = false
 
 ## Frequency, in Hz.
 @export_range(0.1, 5) var f: float = 1 :
@@ -44,6 +45,8 @@ func start(x0: Variant) -> void:
 	_k1 = z / (PI * f)
 	_k2 = 1 / ((2 * PI * f) * (2 * PI * f))
 	_k3 = r * z / (2 * PI * f)
+	
+	started = true
 	
 # TODO INEFFICIENT
 func set_parameters(_f: float = f, _z: float = z, _r: float = r) -> void:

@@ -56,22 +56,24 @@ var new_location: Vector3
 var new_target: Vector3
 
 func _process(delta):
-	new_location = Vector3.ZERO \
-		if not follow_node \
-		else follow_node.position
+	new_location = Vector3.ZERO if not follow_node else follow_node.position
 		
 	horizontal_damper.update(delta, Vector2(new_location.x, new_location.z))
 	vertical_damper.update(delta, new_location.y)
-	
+
 	position = Vector3(
 		horizontal_damper.value.x, 
 		vertical_damper.value, 
 		horizontal_damper.value.y
 	)
-		
+
+	# TODO Too much state to keep track of. Send to Damper
 	if not target_node:
 		target = position
 		return
+		
+	if not target_damper.started:
+		target_damper.start(target_node.position)
 
 	new_target = target_node.position
 	target_damper.update(delta, new_target)
