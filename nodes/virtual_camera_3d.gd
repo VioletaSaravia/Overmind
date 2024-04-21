@@ -116,11 +116,6 @@ func _process(delta):
 		target = position
 		return
 		
-	# Added to .update()
-	# TODO test
-	#if not target_damper.started:
-		#target_damper.start(target_node.position)
-		
 	new_target = target_node.position
 	target_damper.update(delta, new_target)
 	target = target_damper.value
