@@ -4,7 +4,7 @@ class_name DampedValue extends Resource
 @export var enabled: bool = true
 @export var started: bool = false
 
-## Frequency, in Hz.
+## Frequency at which the value oscillates, in Hz.
 @export_range(0.1, 5) var f: float = 1 :
 	set(value):
 		f = value
@@ -34,9 +34,6 @@ var _k3: float
 var value: Variant: 
 	get: return _y
 	
-#func _init(x0: Variant):
-	#start(x0)
-
 func start(x0: Variant) -> void:
 	_y = x0
 	_yd = x0
