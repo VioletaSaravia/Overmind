@@ -6,17 +6,26 @@ class_name VirtualCamera3D extends Node3D
 @export_group("General Settings")
 ## Set the target to be the same as the location. When enabled, all the location
 ## settings affect the target too, and the target settings do nothing.
-## Ideal for player cameras.
+## Ideal for player cameras, or any camera that's meant to focus on the thing it
+## orbits around.
 @export var target_equals_location: bool = true
-## Whether the camera collides with objects or clips through them.
-@export var collides: bool = true
+## Whether the camera collides with objects or clips through them. CURRENTLY BUGGY
+@export var collides: bool = false
 
 @export_group("Location Settings")
 ## Which Node3D's position will be used to set the camera location.
 @export var follow_node: Node3D
+## When enabled, the camera follows the rotation of the node above, effectively
+## staying behind it by default.
+@export var follow_node_rotation: bool = false
 # TODO constraints
+## Dampening values for horizontal movement.
 @export var horizontal_damper: DampedValue = DampedValue.new()
+## Dampening values for vertical movement.
 @export var vertical_damper: DampedValue = DampedValue.new()
+## Dampening values for rotation.
+@export var rotation_damper: DampedValue = DampedValue.new()
+## Orbiting values.
 @export var orbiting: Orbiting3D = Orbiting3D.new()
 
 # TODO
@@ -26,7 +35,9 @@ class_name VirtualCamera3D extends Node3D
 @export_group("Target Settings")
 ## Which Node3D's position(s) will be used to set the camera target.
 @export var target_node: Node3D
+## Dampening values for targeting.
 @export var target_damper: DampedValue = DampedValue.new()
+
 var target: Vector3
 
 func _ready():
