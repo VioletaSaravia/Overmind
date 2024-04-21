@@ -60,6 +60,11 @@ func _set_parameters(_f: float = f, _z: float = z, _r: float = r) -> void:
 	_k3 = r * z / (2 * PI * f)
 	
 func update(delta: float, x: Variant) -> void:
+	if not started:
+		start(x)
+		started = true
+		return
+
 	if not enabled:
 		_y = x # TODO TEST
 		return
