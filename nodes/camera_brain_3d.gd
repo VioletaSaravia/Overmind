@@ -59,8 +59,9 @@ func _process(delta):
 	var local_track = quaternion * Vector3(active.orbiting.track, 0, 0)
 	var local_pedestal = Vector3(0, active.orbiting.pedestal, 0)
 	var local_yaw = active.orbiting.yaw - active.location_rotation.y
+	var local_pitch = active.orbiting.pitch - active.location_rotation.x
 	var new_position: Vector3 = active.position + local_pedestal + local_track \
-		+ calculate_orbit(active.orbiting.dolly, local_yaw, active.orbiting.pitch)
+		+ calculate_orbit(active.orbiting.dolly, local_yaw, local_pitch)
 			
 	# FIXME
 	if active.collides:
@@ -74,7 +75,8 @@ func _process(delta):
 	var track_focus = active.target + calculate_orbit(0, active.orbiting.yaw + -PI/2, 0)
 	look_at(track_focus + Vector3(active.orbiting.pan, active.orbiting.tilt, 0) + local_track)
 	
-	rotate(quaternion * Vector3.FORWARD, active.orbiting.roll)
+	var local_roll = active.orbiting.roll - active.location_rotation.z
+	rotate(quaternion * Vector3.FORWARD, local_roll)
 
 static func calculate_orbit(radius: float, yaw: float, pitch: float) -> Vector3:
 	var ray := Vector3.FORWARD

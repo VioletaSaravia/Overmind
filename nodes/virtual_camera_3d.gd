@@ -46,7 +46,7 @@ class_name VirtualCamera3D extends Node3D
 var target: Vector3
 var location_rotation: Vector3 # Euler angles
 var prev_rotation: Vector3
-var turns: int = 0
+var turns: Vector3i = Vector3i(0, 0, 0)
 
 func _ready():
 	process_priority = 998
@@ -55,7 +55,7 @@ func _ready():
 		if Engine.is_editor_hint():
 			horizontal_damper.start(Vector2(0, 0))
 			vertical_damper.start(0)
-			rotation_damper.start(0)
+			rotation_damper.start(Vector3(0,0,0))
 		else:
 			printerr("No follow node set.")
 		return
@@ -92,12 +92,22 @@ func _process(delta):
 	if follow_node_rotation:
 		# Due to a Node3D's rotation going from -PI to PI, the number of turns needs
 		# to be tracked here so the camera doesn't whiplash when going from PI to -PI
+		# (i.e. when rotation - prev_rotation is a large number)
 		if (follow_node.rotation - prev_rotation).y > 2:
-			turns += 1
+			turns.y += 1
 		if (follow_node.rotation - prev_rotation).y < -2:
-			turns -= 1
+			turns.y -= 1
+		if (follow_node.rotation - prev_rotation).x > 2:
+			turns.x += 1
+		if (follow_node.rotation - prev_rotation).x < -2:
+			turns.x -= 1
+		if (follow_node.rotation - prev_rotation).z > 2:
+			turns.z += 1
+		if (follow_node.rotation - prev_rotation).z < -2:
+			turns.z -= 1
 		
-		rotation_damper.update(delta, follow_node.rotation + Vector3(0, TAU * -turns, 0))
+		rotation_damper.update(delta, follow_node.rotation + 
+			Vector3(TAU * -turns.x, TAU * -turns.y, TAU * -turns.z))
 		location_rotation = rotation_damper.value
 		prev_rotation = follow_node.rotation
 
