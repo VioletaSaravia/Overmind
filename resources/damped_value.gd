@@ -2,7 +2,7 @@
 class_name DampedValue extends Resource
 
 @export var enabled: bool = true
-@export var started: bool = false
+var started: bool = false
 
 ## Frequency at which the value oscillates, in Hz.
 @export_range(0.1, 5) var f: float = 1 :
