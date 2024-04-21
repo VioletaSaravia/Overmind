@@ -13,7 +13,6 @@ var vcams: Array[VirtualCamera3D]:
 	set(value):
 		if vcams.size() == 0:
 			return
-			
 		active_cam = value % vcams.size()
 
 var active: VirtualCamera3D: 
@@ -57,15 +56,15 @@ func _process(delta):
 			node.execute(delta)
 	
 	# PLACEMENT
-	var location: Vector3 = active.position
 	var local_track = quaternion * Vector3(active.orbiting.track, 0, 0)
 	var local_pedestal = Vector3(0, active.orbiting.pedestal, 0)
-	
-	var new_position: Vector3 = location + local_pedestal + local_track \
-		+ calculate_orbit(active.orbiting.dolly, active.orbiting.yaw, active.orbiting.pitch)
+	var local_yaw = active.orbiting.yaw - active.location_rotation.y
+	var new_position: Vector3 = active.position + local_pedestal + local_track \
+		+ calculate_orbit(active.orbiting.dolly, local_yaw, active.orbiting.pitch)
 			
+	# FIXME
 	if active.collides:
-		var query = PhysicsRayQueryParameters3D.create(location, new_position, 1)
+		var query = PhysicsRayQueryParameters3D.create(active.position, new_position, 1)
 		query.collide_with_areas = true
 		col = space_state.intersect_ray(query)
 	
