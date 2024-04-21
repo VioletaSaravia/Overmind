@@ -45,7 +45,6 @@ func start(x0: Variant) -> void:
 	
 	started = true
 	
-# TODO INEFFICIENT
 func set_parameters(_f: float = f, _z: float = z, _r: float = r) -> void:
 	f = _f
 	z = _z
@@ -63,7 +62,7 @@ func update(delta: float, x: Variant) -> void:
 		return
 
 	if not enabled:
-		_y = x # TODO TEST
+		_y = x
 		return
 
 	var xd = (x - _xp) / delta

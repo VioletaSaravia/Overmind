@@ -41,7 +41,6 @@ func _get_configuration_warnings() -> PackedStringArray:
 		return []
 
 func _process(delta):
-	# TODO ugh
 	vcams.clear()
 	for cam in get_children():
 		vcams.push_back(cam)

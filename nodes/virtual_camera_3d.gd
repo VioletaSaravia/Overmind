@@ -23,7 +23,6 @@ class_name VirtualCamera3D extends Node3D
 ## When enabled, the camera follows the rotation of the node above, effectively
 ## staying behind it by default.
 @export var follow_node_rotation: bool = false
-# TODO constraints
 ## Dampening values for horizontal movement.
 @export var horizontal_damper: DampedValue = DampedValue.new()
 ## Dampening values for vertical movement.
