@@ -59,6 +59,8 @@ func _process(delta):
 		+ active.orbiting.offset \
 		+ polar_to_xy(active.orbiting.radius, active.orbiting.angle)
 		
+	rotation = active.location_rotation + active.orbiting.rotation
+		
 	zoom = Vector2(active.orbiting.zoom, active.orbiting.zoom)
 
 static func polar_to_xy(radius: float, angle: float) -> Vector2:
