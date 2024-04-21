@@ -5,7 +5,12 @@ class_name VirtualCamera2D extends Node2D
 
 @export_group("Location Settings")
 ## Which Node2D's position will be used to set the camera location.
-@export var follow_node: Node2D
+@export var follow_node: Node2D:
+	set(value):
+		if typeof(value) in [CameraBrain2D, VirtualCamera2D]:
+			push_warning("Do not set a camera's location as another camera.")
+			return
+		follow_node = value
 @export var follow_x: bool = true
 @export var follow_y: bool = true
 @export var follow_rotation: bool = false

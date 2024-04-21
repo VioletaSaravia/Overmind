@@ -14,7 +14,12 @@ class_name VirtualCamera3D extends Node3D
 
 @export_group("Location Settings")
 ## Which Node3D's position will be used to set the camera location.
-@export var follow_node: Node3D
+@export var follow_node: Node3D:
+	set(value):
+		if typeof(value) in [CameraBrain3D, VirtualCamera3D]:
+			push_warning("Do not set a camera's location as another camera.")
+			return
+		follow_node = value
 ## When enabled, the camera follows the rotation of the node above, effectively
 ## staying behind it by default.
 @export var follow_node_rotation: bool = false
