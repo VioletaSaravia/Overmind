@@ -4,11 +4,6 @@
 class_name VirtualCamera3D extends Node3D
 
 @export_group("General Settings")
-## Set the target to be the same as the location. When enabled, all the location
-## settings affect the target too, and the target settings do nothing.
-## Ideal for player cameras, or any camera that's meant to focus on the thing it
-## orbits around.
-@export var target_equals_location: bool = true
 ## Whether the camera collides with objects or clips through them. CURRENTLY BUGGY
 @export var collides: bool = false
 
@@ -38,6 +33,9 @@ class_name VirtualCamera3D extends Node3D
 
 @export_group("Target Settings")
 ## Which Node3D's position(s) will be used to set the camera target.
+## When set to a node, the camera will look at its target instead of its location node. 
+## When disabled, all the location settings affect the target too, and the target settings do nothing;
+## this is ideal for player cameras, or any camera that's meant to focus on the thing it orbits around.
 @export var target_node: Node3D
 ## Dampening values for targeting.
 @export var target_damper: DampedValue = DampedValue.new()
@@ -88,7 +86,7 @@ func _process(delta):
 	)
 	
 	# ROTATION
-	if follow_node_rotation:
+	if follow_node_rotation and follow_node:
 		# Due to a Node3D's rotation going from -PI to PI, the number of turns needs
 		# to be tracked here so the camera doesn't whiplash when going from PI to -PI
 		# (i.e. when rotation - prev_rotation is a large number)
