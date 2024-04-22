@@ -22,16 +22,15 @@ class_name VirtualCamera3D extends Node3D
 ## Orbiting values.
 @export var orbiting: Orbiting3D = Orbiting3D.new()
 @export_group("Rotation Settings")
-# TODO should be horizontal/vertical instead of x/y/z?
-## When enabled, the camera follows the location node's x axis rotation.
-@export var follow_x_rotation: bool = false
-## When enabled, the camera follows the location node's y axis rotation.
-@export var follow_y_rotation: bool = false
 ## When enabled, the camera follows the rotation of the location node above,
 ## effectively staying behind it by default.
-@export var follow_z_rotation: bool = false
-## Dampening values for rotation.
-@export var rotation_damper: DampedValue = DampedValue.new()
+@export var follow_y_rotation: bool = false
+## When enabled, the camera follows the location node's x and z axis rotation.
+@export var follow_side_rotation: bool = false
+## Dampening values for y axis rotation.
+@export var y_rotation_damper: DampedValue = DampedValue.new()
+## Dampening values for x and z axis rotation.
+@export var side_rotation_damper: DampedValue = DampedValue.new()
 
 # TODO
 # CURRENT EXPORT RANGES FOR TILT/PAN/ETC ARE KINDA RANDOM
@@ -58,7 +57,8 @@ func _ready():
 		if Engine.is_editor_hint():
 			horizontal_damper.start(Vector2(0, 0))
 			vertical_damper.start(0)
-			rotation_damper.start(Vector3(0,0,0))
+			y_rotation_damper.start(0)
+			side_rotation_damper.start(Vector2(0, 0))
 		else:
 			printerr("No follow node set.")
 		return
@@ -66,7 +66,9 @@ func _ready():
 	horizontal_damper.start(
 		Vector2(follow_node.position.x, follow_node.position.z))
 	vertical_damper.start(follow_node.position.y)
-	rotation_damper.start(follow_node.rotation)
+	y_rotation_damper.start(follow_node.rotation.y)
+	side_rotation_damper.start(
+		Vector2(follow_node.rotation.x, follow_node.rotation.z))
 	
 	position = follow_node.position
 	prev_rotation = follow_node.rotation
@@ -95,32 +97,38 @@ func _process(delta):
 	# Due to a Node3D's rotation going from -PI to PI, the number of turns needs
 	# to be tracked here so the camera doesn't whiplash when rotating between PI and -PI
 	# (i.e. when rotating between ~179º and ~181º)
+	if follow_side_rotation and follow_node:
+		if (follow_node.rotation - prev_rotation).z > 2:
+			turns.z += 1
+		if (follow_node.rotation - prev_rotation).z < -2:
+			turns.z -= 1
+		if (follow_node.rotation - prev_rotation).x > 2:
+			turns.x += 1
+		if (follow_node.rotation - prev_rotation).x < -2:
+			turns.x -= 1
+		
+		side_rotation_damper.update(delta, 
+			Vector2(follow_node.rotation.x, follow_node.rotation.z) + 
+			Vector2(TAU * -turns.x, TAU * -turns.z))
+		location_rotation.x = side_rotation_damper.value.x
+		location_rotation.z = side_rotation_damper.value.z
+		prev_rotation.x = follow_node.rotation.x
+		prev_rotation.z = follow_node.rotation.z
+		
 	if follow_y_rotation and follow_node:
 		if (follow_node.rotation - prev_rotation).y > 2:
 			turns.y += 1
 		if (follow_node.rotation - prev_rotation).y < -2:
 			turns.y -= 1
-	if follow_x_rotation and follow_node:
-		if (follow_node.rotation - prev_rotation).x > 2:
-			turns.x += 1
-		if (follow_node.rotation - prev_rotation).x < -2:
-			turns.x -= 1
-	if follow_z_rotation and follow_node:
-		if (follow_node.rotation - prev_rotation).z > 2:
-			turns.z += 1
-		if (follow_node.rotation - prev_rotation).z < -2:
-			turns.z -= 1
 		
-		rotation_damper.update(delta, follow_node.rotation + 
-			Vector3(TAU * -turns.x, TAU * -turns.y, TAU * -turns.z))
-		location_rotation = rotation_damper.value
-		prev_rotation = follow_node.rotation
+		y_rotation_damper.update(delta, follow_node.rotation.y + TAU * -turns.y)
+		location_rotation.y = y_rotation_damper.value
+		prev_rotation.y = follow_node.rotation.y
 
 	# TARGETING
-	if not target_node:
+	if target_node:
+		new_target = target_node.position
+		target_damper.update(delta, new_target)
+		target = target_damper.value
+	else:
 		target = position
-		return
-		
-	new_target = target_node.position
-	target_damper.update(delta, new_target)
-	target = target_damper.value
