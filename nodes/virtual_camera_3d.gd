@@ -15,17 +15,23 @@ class_name VirtualCamera3D extends Node3D
 			push_warning("Do not set a camera's location as another camera.")
 			return
 		follow_node = value
-## When enabled, the camera follows the rotation of the node above, effectively
-## staying behind it by default.
-@export var follow_node_rotation: bool = false
 ## Dampening values for horizontal movement.
 @export var horizontal_damper: DampedValue = DampedValue.new()
 ## Dampening values for vertical movement.
 @export var vertical_damper: DampedValue = DampedValue.new()
-## Dampening values for rotation.
-@export var rotation_damper: DampedValue = DampedValue.new()
 ## Orbiting values.
 @export var orbiting: Orbiting3D = Orbiting3D.new()
+@export_group("Rotation Settings")
+# TODO should be horizontal/vertical instead of x/y/z?
+## When enabled, the camera follows the location node's x axis rotation.
+@export var follow_x_rotation: bool = false
+## When enabled, the camera follows the location node's y axis rotation.
+@export var follow_y_rotation: bool = false
+## When enabled, the camera follows the rotation of the location node above,
+## effectively staying behind it by default.
+@export var follow_z_rotation: bool = false
+## Dampening values for rotation.
+@export var rotation_damper: DampedValue = DampedValue.new()
 
 # TODO
 # CURRENT EXPORT RANGES FOR TILT/PAN/ETC ARE KINDA RANDOM
@@ -86,18 +92,20 @@ func _process(delta):
 	)
 	
 	# ROTATION
-	if follow_node_rotation and follow_node:
-		# Due to a Node3D's rotation going from -PI to PI, the number of turns needs
-		# to be tracked here so the camera doesn't whiplash when going from PI to -PI
-		# (i.e. when rotation - prev_rotation is a large number)
+	# Due to a Node3D's rotation going from -PI to PI, the number of turns needs
+	# to be tracked here so the camera doesn't whiplash when rotating between PI and -PI
+	# (i.e. when rotating between ~179º and ~181º)
+	if follow_y_rotation and follow_node:
 		if (follow_node.rotation - prev_rotation).y > 2:
 			turns.y += 1
 		if (follow_node.rotation - prev_rotation).y < -2:
 			turns.y -= 1
+	if follow_x_rotation and follow_node:
 		if (follow_node.rotation - prev_rotation).x > 2:
 			turns.x += 1
 		if (follow_node.rotation - prev_rotation).x < -2:
 			turns.x -= 1
+	if follow_z_rotation and follow_node:
 		if (follow_node.rotation - prev_rotation).z > 2:
 			turns.z += 1
 		if (follow_node.rotation - prev_rotation).z < -2:
