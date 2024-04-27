@@ -1,10 +1,11 @@
 @tool
-extends CameraScript3D
+extends Node
+@onready var cam: VirtualCamera3D
 
 # TODO Test
-func execute(delta):
+func _process(delta):
 	if Input.is_action_pressed("move_right") or Input.is_action_pressed("move_left"):
-		virtual_cam.horizontal_damper.set_parameters(1, 2, 3)
+		cam.horizontal_damper.set_parameters(1, 2, 3)
 		
 	if Input.is_action_pressed("move_up") or Input.is_action_pressed("move_down"):
-		virtual_cam.horizontal_damper.set_parameters(1, 1, 0)
+		cam.horizontal_damper.set_parameters(1, 1, 0)

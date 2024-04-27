@@ -1,3 +1,0 @@
-extends CameraFollow
-class_name SingleNodeFollow
-

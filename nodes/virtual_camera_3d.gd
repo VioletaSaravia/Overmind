@@ -111,7 +111,7 @@ func _process(delta):
 			Vector2(follow_node.rotation.x, follow_node.rotation.z) + 
 			Vector2(TAU * -turns.x, TAU * -turns.z))
 		location_rotation.x = side_rotation_damper.value.x
-		location_rotation.z = side_rotation_damper.value.z
+		location_rotation.z = side_rotation_damper.value.y
 		prev_rotation.x = follow_node.rotation.x
 		prev_rotation.z = follow_node.rotation.z
 		

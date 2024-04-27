@@ -1,9 +1,9 @@
-@tool
-extends CameraScript3D
+extends Node
+@onready var cam: VirtualCamera3D
 
 @export var cam_turn_speed: float = 2
 
-func execute(delta):
+func _process(delta):
 	var manual_yaw := Input.get_axis("turn_left", "turn_right")
 	cam.active.orbiting.yaw += cam_turn_speed * manual_yaw * delta
 	
