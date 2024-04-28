@@ -15,7 +15,7 @@ var vcams: Array[VirtualCamera3D]:
 			return
 		active_cam = value % vcams.size()
 
-var active: VirtualCamera3D: 
+var active: VirtualCamera3D:
 	get: return vcams[active_cam]
 
 func set_cam(name: VirtualCamera3D):
@@ -28,11 +28,11 @@ func _ready():
 	for cam in get_children():
 		if cam is VirtualCamera3D:
 			vcams.push_back(cam)
-	
+
 	update_configuration_warnings()
 	if vcams.size() == 0:
 		return
-	
+
 	position = active.position
 	rotation = active.rotation
 
@@ -51,50 +51,50 @@ func _process(delta):
 	for cam in get_children():
 		if cam is VirtualCamera3D:
 			vcams.push_back(cam)
-	
+
 	update_configuration_warnings()
 	if vcams.size() == 0:
 		return
-	
+
 	if not transitioning:
 		var new_cam = calculate_camera(active)
 		position = new_cam[0]
 		look_at(new_cam[1])
 		rotate(quaternion * Vector3.FORWARD, new_cam[2])
 		return
-	
+
 	# Instant transition
 	if trans_length == 0:
 		var new_cam = calculate_camera(trans_to)
 		position = new_cam[0]
 		look_at(new_cam[1])
 		rotate(quaternion * Vector3.FORWARD, new_cam[2])
-		
+
 		transitioning = false
 		set_cam(trans_to) # TODO OOPS. THINK HOW TO CHANGE THIS
 		return
-	
+
 	# Timed lerp transition
 	if transition_type == TransitionType.LERP:
 		var cam_from: Array = calculate_camera(active)
 		var cam_to: Array = calculate_camera(trans_to)
-		
+
 		position = lerp(cam_from[0], cam_to[0], cur_length / trans_length)
 		look_at(lerp(cam_from[1], cam_to[1], cur_length / trans_length))
 		rotate(quaternion * Vector3.FORWARD,
 			lerp(cam_from[2], cam_to[2], cur_length / trans_length))
-	
+
 	# Timed path transition
 	if transition_type == TransitionType.PATH:
 		var cam_from: Array = calculate_camera(active)
 		var cam_to: Array = calculate_camera(trans_to)
 		trans_path.progress_ratio += delta / trans_length
-		
+
 		position = trans_path.position
 		look_at(lerp(cam_from[1], cam_to[1], cur_length / trans_length))
 		rotate(quaternion * Vector3.FORWARD,
 			lerp(cam_from[2], cam_to[2], cur_length / trans_length))
-	
+
 	cur_length += delta
 	if cur_length > trans_length:
 		transitioning = false
@@ -104,10 +104,10 @@ func _process(delta):
 static func calculate_orbit(radius: float, yaw: float, pitch: float) -> Vector3:
 	var ray := Vector3.FORWARD
 	ray = Quaternion(Vector3.UP, TAU - yaw) * ray
-	
+
 	var pitchaxis := ray.cross(Vector3.UP)
 	ray = Quaternion(pitchaxis, TAU - pitch) * ray
-	
+
 	return ray * - radius
 
 func calculate_camera(cam: VirtualCamera3D) -> Array: # (Vector3, Vector3, float)
@@ -118,22 +118,22 @@ func calculate_camera(cam: VirtualCamera3D) -> Array: # (Vector3, Vector3, float
 	var local_pitch = cam.orbiting.pitch - cam.location_rotation.x
 	var new_position: Vector3 = cam.position + local_pedestal + local_track \
 		+ calculate_orbit(cam.orbiting.dolly, local_yaw, local_pitch)
-	
+
 	# FIXME COLLISION CHECKING
 	if cam.collides:
 		var query = PhysicsRayQueryParameters3D.create(cam.position, new_position, 1)
 		query.collide_with_areas = true
 		col = space_state.intersect_ray(query)
-	
+
 	var pos = col.position if col else new_position
-	
+
 	# TARGETING
 	var track_focus = cam.target + calculate_orbit(0, cam.orbiting.yaw + -PI/2, 0)
 	var tar = track_focus + Vector3(cam.orbiting.pan, cam.orbiting.tilt, 0) + local_track
-	
+
 	# ROTATION
 	var rot = cam.orbiting.roll - cam.location_rotation.z
-	
+
 	return [pos, tar, rot]
 
 enum TransitionType {PATH, LERP}

@@ -38,7 +38,7 @@ class_name VirtualCamera3D extends Node3D
 
 @export_group("Target Settings")
 ## Which Node3D's position(s) will be used to set the camera target.
-## When set to a node, the camera will look at its target instead of its location node. 
+## When set to a node, the camera will look at its target instead of its location node.
 ## When disabled, all the location settings affect the target too, and the target settings do nothing;
 ## this is ideal for player cameras, or any camera that's meant to focus on the thing it orbits around.
 @export var target_node: Node3D
@@ -52,7 +52,7 @@ var turns: Vector3i = Vector3i(0, 0, 0)
 
 func _ready():
 	process_priority = 998
-	
+
 	if not follow_node:
 		if Engine.is_editor_hint():
 			horizontal_damper.start(Vector2(0, 0))
@@ -69,7 +69,7 @@ func _ready():
 	y_rotation_damper.start(follow_node.rotation.y)
 	side_rotation_damper.start(
 		Vector2(follow_node.rotation.x, follow_node.rotation.z))
-	
+
 	position = follow_node.position
 	prev_rotation = follow_node.rotation
 
@@ -88,11 +88,11 @@ func _process(delta):
 	horizontal_damper.update(delta, Vector2(new_location.x, new_location.z))
 	vertical_damper.update(delta, new_location.y)
 	position = Vector3(
-		horizontal_damper.value.x, 
-		vertical_damper.value, 
+		horizontal_damper.value.x,
+		vertical_damper.value,
 		horizontal_damper.value.y
 	)
-	
+
 	# ROTATION
 	# Due to a Node3D's rotation going from -PI to PI, the number of turns needs
 	# to be tracked here so the camera doesn't whiplash when rotating between PI and -PI
@@ -106,21 +106,21 @@ func _process(delta):
 			turns.x += 1
 		if (follow_node.rotation - prev_rotation).x < -2:
 			turns.x -= 1
-		
-		side_rotation_damper.update(delta, 
-			Vector2(follow_node.rotation.x, follow_node.rotation.z) + 
+
+		side_rotation_damper.update(delta,
+			Vector2(follow_node.rotation.x, follow_node.rotation.z) +
 			Vector2(TAU * -turns.x, TAU * -turns.z))
 		location_rotation.x = side_rotation_damper.value.x
 		location_rotation.z = side_rotation_damper.value.y
 		prev_rotation.x = follow_node.rotation.x
 		prev_rotation.z = follow_node.rotation.z
-		
+
 	if follow_y_rotation and follow_node:
 		if (follow_node.rotation - prev_rotation).y > 2:
 			turns.y += 1
 		if (follow_node.rotation - prev_rotation).y < -2:
 			turns.y -= 1
-		
+
 		y_rotation_damper.update(delta, follow_node.rotation.y + TAU * -turns.y)
 		location_rotation.y = y_rotation_damper.value
 		prev_rotation.y = follow_node.rotation.y
