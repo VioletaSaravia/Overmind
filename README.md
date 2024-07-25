@@ -22,7 +22,7 @@ Overmind is a camera system based around virtual camera nodes that hold informat
 
 Overmind allows you to procedurally animate your camera's movement in terms of three parameters F, Z and R. For a detailed explanation of this method, I recommend checking out the following video: https://www.youtube.com/watch?v=KPoeNZZ6H4s. The "DampedValue" resource is an implementation of the code in this video.
 
-## TODO List
+## Pending
 
 - [DONE] Follow Node3D rotation
 - [DONE] Transitions (splines, tweens, instant)
