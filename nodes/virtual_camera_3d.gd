@@ -6,6 +6,8 @@ class_name VirtualCamera3D extends Node3D
 @export_group("General Settings")
 ## Whether the camera collides with objects or clips through them. CURRENTLY BUGGY
 @export var collides: bool = false
+## Represent the virtual camera as an eyeball in the viewport. Only in the editor.
+@export var show_eyeball: bool = true
 
 @export_group("Location Settings")
 ## Which Node3D's position will be used to set the camera location.
@@ -50,9 +52,20 @@ var location_rotation: Vector3 # Euler angles
 var prev_rotation: Vector3
 var turns: Vector3i = Vector3i(0, 0, 0)
 
-func _ready():
-	process_priority = 998
+var model: MeshInstance3D
 
+static var model_asset = preload("res://addons/Overmind/assets/eye.obj")
+
+func _ready():
+	top_level = true
+	process_priority = 998
+	
+	if Engine.is_editor_hint():
+		add_child(MeshInstance3D.new())
+		self.model = get_child(0)
+		self.model.mesh = model_asset
+		self.model.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		
 	if not follow_node:
 		if Engine.is_editor_hint():
 			horizontal_damper.start(Vector2(0, 0))
@@ -83,6 +96,9 @@ var new_location: Vector3
 var new_target: Vector3
 
 func _process(delta):
+	if self.model:
+		self.model.visible = show_eyeball
+	
 	# POSITION
 	new_location = Vector3.ZERO if not follow_node else follow_node.position
 	horizontal_damper.update(delta, Vector2(new_location.x, new_location.z))
@@ -132,3 +148,52 @@ func _process(delta):
 		target = target_damper.value
 	else:
 		target = position
+		
+	calculate_camera()
+	
+static func calculate_orbit(radius: float, yaw: float, pitch: float) -> Vector3:
+	var ray := Vector3.FORWARD
+	ray = Quaternion(Vector3.UP, TAU - yaw) * ray
+
+	var pitchaxis := ray.cross(Vector3.UP)
+	ray = Quaternion(pitchaxis, TAU - pitch) * ray
+
+	return ray * -radius
+
+# Collision-related variables
+var col: Dictionary
+@onready var space_state = get_world_3d().direct_space_state
+
+# Needed to use look_at and rotate on CameraBrain, I think?
+var targeting: Vector3
+var rotating: float
+
+func calculate_camera():
+	# PLACEMENT
+	var local_track = quaternion * Vector3(orbiting.track, 0, 0)
+	var local_pedestal = Vector3(0, orbiting.pedestal, 0)
+	var local_yaw = orbiting.yaw - location_rotation.y
+	var local_pitch = orbiting.pitch - location_rotation.x
+	var new_position: Vector3 = position + local_pedestal + local_track \
+		+ calculate_orbit(orbiting.dolly, local_yaw, local_pitch)
+
+	# FIXME COLLISION CHECKING
+	if collides:
+		var query = PhysicsRayQueryParameters3D.create(position, new_position, 1)
+		query.collide_with_areas = true
+		col = space_state.intersect_ray(query)
+
+	var pos = col.position if col else new_position
+
+	# TARGETING
+	var track_focus = target + calculate_orbit(0, orbiting.yaw + -PI / 2, 0)
+	var tar = track_focus + Vector3(orbiting.pan, orbiting.tilt, 0) + local_track
+
+	# ROTATION
+	var rot = orbiting.roll - location_rotation.z
+
+	position = pos
+	targeting = tar
+	look_at(tar)
+	rotating = rot
+	rotate(quaternion * Vector3.FORWARD, rot)

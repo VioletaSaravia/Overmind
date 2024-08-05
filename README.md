@@ -1,4 +1,4 @@
-# Overmind v0.7.0
+# Overmind 0.7.2
 
 Overmind is a camera system based around virtual camera nodes that hold information about location, target and translation. It does not aim to be a clone or replacement of its inspiration, but rather to adapt its main workflow into a simple, indie-oriented package that follows the godot philosophy: Everything is a node, runs fast, and the provided features are simple but complete, and can be easily extended via gdscript.
 
@@ -25,6 +25,11 @@ Overmind allows you to procedurally animate your camera's movement in terms of t
 ## Pending
 
 - [DONE] Follow Node3D rotation
-- [DONE] Transitions (splines, tweens, instant)
+- Transitions (splines, tweens, instant)
 - Target deadzones
 - [1/3] Demo cameras
+- Eyeball Node tree icon
+
+## Credits
+
+- Eye by Minh Nguyen Tri [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/5k9K6C4nQPw)
