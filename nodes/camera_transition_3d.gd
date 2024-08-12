@@ -2,6 +2,10 @@
 @icon("res://addons/Overmind/assets/transition_red.svg")
 class_name CameraTransition3D extends Path3D
 
+# TODO NEW IDEA
+# Add a VirtualCamera to cameratransition (as a child or inherited?) and calculate
+# the transition inside it?
+
 @export var cam_1: VirtualCamera3D
 @export var cam_2: VirtualCamera3D
 # var path: PathFollow3D

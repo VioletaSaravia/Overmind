@@ -1,6 +1,16 @@
-# Overmind 0.7.2
+# Overmind 0.8.0
 
-Overmind is a camera system based around virtual camera nodes that hold information about location, target and translation. It does not aim to be a clone or replacement of its inspiration, but rather to adapt its main workflow into a simple, indie-oriented package that follows the godot philosophy: Everything is a node, runs fast, and the provided features are simple but complete, and can be easily extended via gdscript.
+Overmind is a camera system based around virtual camera nodes that hold information about location, target and translation. It aims to be a simple, gamejam- and indie-oriented package that follows the godot philosophy: Everything is a node, gets you started fast, the provided features are simple but complete for 80% of use cases, and can be easily extended via gdscript if insufficient.
+
+### What is it good for?
+
+- Games that make a simple or standard use of cameras.
+- Games with cutscenes or transitions.
+- Games that require smooth camera movement and transitions (Action, racing, adventure, etc.)
+
+### What is it *not* good for?
+
+- Games that need 6-DOF, complex pivots or whose ground "shifts" in space. To achieve simplicity, Overmind is built around certain assumptions that almost no game violates, e.g., that the gravity will always point in the same direction. Though possible, I wouldn't try making Super Mario Galaxy with this plugin.
 
 ## Features
 

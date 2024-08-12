@@ -39,10 +39,11 @@ func _ready():
 	rotation = active.rotation
 
 func _get_configuration_warnings() -> PackedStringArray:
+	var result: Array[String] = []
 	if vcams.size() == 0:
-		return ["CameraBrain must have at least one VirtualCamera3D as a child to work."]
-	else:
-		return []
+		result.append("CameraBrain must have at least one VirtualCamera3D as a child to work.")
+	
+	return result
 
 func _process(delta):
 	vcams.clear()
