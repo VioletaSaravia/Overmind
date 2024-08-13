@@ -1,4 +1,4 @@
-# Overmind 0.8.0
+# Overmind 0.8.1
 
 Overmind is a camera system based around virtual camera nodes that hold information about location, target and translation. It aims to be a simple, gamejam- and indie-oriented package that follows the godot philosophy: Everything is a node, gets you started fast, the provided features are simple but complete for 80% of use cases, and can be easily extended via gdscript if insufficient.
 
