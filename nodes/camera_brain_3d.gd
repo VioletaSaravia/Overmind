@@ -11,8 +11,7 @@ var vcams: Array[VirtualCamera3D]:
 
 @export var active_cam: int:
 	set(value):
-		if vcams.size() == 0:
-			return
+		if vcams.size() == 0: return
 		active_cam = value % vcams.size()
 
 var active: VirtualCamera3D:
@@ -32,8 +31,7 @@ func _ready():
 			vcams.push_back(cam)
 
 	update_configuration_warnings()
-	if vcams.size() == 0:
-		return
+	if vcams.size() == 0: return
 
 	position = active.position
 	rotation = active.rotation
@@ -52,8 +50,7 @@ func _process(delta):
 			vcams.push_back(cam)
 	
 	update_configuration_warnings()
-	if vcams.size() == 0:
-		return
+	if vcams.size() == 0: return
 	
 	position = active.position
 	look_at(active.targeting)

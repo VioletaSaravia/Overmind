@@ -5,11 +5,11 @@ class_name VirtualCamera3D extends Node3D
 
 @export_group("General")
 ## Freeze the camera in place.
-@export var frozen: bool = false
+@export var frozen := false
 ## Whether the camera collides with objects or clips through them.
-@export var collides: bool = false
+@export var collides := false
 ## Represent the virtual camera as an eyeball in the viewport. Editor only.
-@export var show_eyeball: bool = true
+@export var show_eyeball := true
 
 @export_group("Orbiting")
 ## Which Node3D's position the camera will orbit around.
@@ -23,8 +23,6 @@ class_name VirtualCamera3D extends Node3D
 @export var horizontal_damper := DampedValue.new()
 ## Damping values for vertical movement.
 @export var vertical_damper := DampedValue.new()
-## Damping values for axis rotation.
-@export var rotation_damper := DampedValue.new()
 ## Offset from the orbit. Z moves back and forth, X and Y pan and elevate.
 @export var distance := Vector3(0, 0, 3)
 @export var distance_damper := DampedValue.new()
@@ -35,6 +33,8 @@ class_name VirtualCamera3D extends Node3D
 ## effectively staying behind it by default. Great for racing games, but 
 ## you'll want manual rotation controls for most other games.
 @export var follow_rotation: bool = false
+## Damping values for axis rotation.
+@export var rotation_damper := DampedValue.new()
 
 @export_group("Look At")
 ## Which node the camera will look at. Leave empty to look at the orbit node.
@@ -42,7 +42,7 @@ class_name VirtualCamera3D extends Node3D
 ## Damping values for targeting.
 @export var look_damper := DampedValue.new()
 ## Pan and tilt the camera.
-@export var look_offset: Vector2 = Vector2(0, 0)
+@export var look_offset := Vector2(0, 0)
 
 @export_group("Manual Input")
 @export var actions := CameraControls.new()

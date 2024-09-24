@@ -4,24 +4,24 @@ class_name DampedValue extends Resource
 @export var enabled: bool = true
 var started: bool = false
 
-## Frequency at which the value oscillates, in Hz.
-@export_range(0.1, 5) var f: float = 1 :
+## Frequency (f) at which the value oscillates, in Hz.
+@export_range(0.1, 5) var freq: float = 1:
 	set(value):
-		f = value
+		freq = value
 		_set_parameters(value)
 
-## Damping Coefficient, describes how the system settles on target.
-@export_range(0, 2) var z: float = 1 :
+## Damping Coefficient (z), describes how the system settles on target.
+@export_range(0, 2) var damp: float = 1:
 	set(value):
-		z = value
-		_set_parameters(f, value)
+		damp = value
+		_set_parameters(freq, value)
 
-## Initial response of the system. At 1, the system reacts immediately to input.
+## Initial response of the system (r). At 1, the system reacts immediately to input.
 ## Above 1, the system overshoots the target. Below 0, the motion is anticipated.
-@export_range(-5, 5) var r: float = 0 :
+@export_range(-5, 5) var resp: float = 0:
 	set(value):
-		r = value
-		_set_parameters(f, z, value)
+		resp = value
+		_set_parameters(freq, damp, value)
 
 var _xp: Variant # Previous input
 var _yd: Variant # State variable
@@ -31,7 +31,7 @@ var _k1: float
 var _k2: float
 var _k3: float
 
-var value: Variant: 
+var value: Variant:
 	get: return _y
 	
 func start(x0: Variant) -> void:
@@ -39,21 +39,21 @@ func start(x0: Variant) -> void:
 	_yd = x0
 	_xp = x0
 	
-	_k1 = z / (PI * f)
-	_k2 = 1 / ((2 * PI * f) * (2 * PI * f))
-	_k3 = r * z / (2 * PI * f)
+	_k1 = damp / (PI * freq)
+	_k2 = 1 / ((2 * PI * freq) * (2 * PI * freq))
+	_k3 = resp * damp / (2 * PI * freq)
 	
 	started = true
 	
-func set_parameters(_f: float = f, _z: float = z, _r: float = r) -> void:
-	f = _f
-	z = _z
-	r = _r
+func set_parameters(_f: float = freq, _z: float = damp, _r: float = resp) -> void:
+	freq = _f
+	damp = _z
+	resp = _r
 
-func _set_parameters(_f: float = f, _z: float = z, _r: float = r) -> void:
-	_k1 = z / (PI * f)
-	_k2 = 1 / ((2 * PI * f) * (2 * PI * f))
-	_k3 = r * z / (2 * PI * f)
+func _set_parameters(_f: float = freq, _z: float = damp, _r: float = resp) -> void:
+	_k1 = damp / (PI * freq)
+	_k2 = 1 / ((2 * PI * freq) * (2 * PI * freq))
+	_k3 = resp * damp / (2 * PI * freq)
 	
 func update(delta: float, x: Variant) -> void:
 	if not started:
