@@ -11,12 +11,11 @@ var vcams: Array[VirtualCamera2D]:
 
 @export var active_cam: int:
 	set(value):
-		if vcams.size() == 0:
-			return
+		if vcams.size() == 0: return
 			
 		active_cam = value % vcams.size()
 
-var active: VirtualCamera2D: 
+var active: VirtualCamera2D:
 	get: return vcams[active_cam]
 
 func _ready():
@@ -26,8 +25,7 @@ func _ready():
 		
 	update_configuration_warnings()
 	
-	if vcams.size() == 0:
-		return
+	if vcams.size() == 0: return
 
 	position = active.position
 
@@ -47,8 +45,7 @@ func _process(delta):
 		
 	update_configuration_warnings()
 		
-	if vcams.size() == 0:
-		return
+	if vcams.size() == 0: return
 		
 	if not Engine.is_editor_hint():
 		for node in active.find_children("", "CameraScript3D"):
